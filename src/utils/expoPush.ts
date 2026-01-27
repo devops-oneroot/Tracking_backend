@@ -1,5 +1,16 @@
 import fetch from "node-fetch";
 
+type ExpoPushTicket = {
+  status: "ok" | "error";
+  id?: string;
+  message?: string;
+  details?: any;
+};
+
+type ExpoPushResponse = {
+  data: ExpoPushTicket;
+};
+
 export async function sendExpoPush(
   token: string,
   title: string,
@@ -22,11 +33,11 @@ export async function sendExpoPush(
     }),
   });
 
-  const json = await res.json();
+  const json = (await res.json()) as ExpoPushResponse;
 
-  if (json.data?.status !== "ok") {
-    console.error("❌ Expo Push Failed:", JSON.stringify(json));
+  if (json.data.status !== "ok") {
+    console.error("❌ Expo Push Failed:", json.data);
   } else {
-    console.log("✅ Expo Push Sent:", json.data.id);
+    console.log("✅ Expo Push Sent. Ticket ID:", json.data.id);
   }
 }
