@@ -9,8 +9,9 @@ const userSchema = new Schema(
       enum: ["field_guy", "agronomist"],
       required: true,
     },
+    fcmToken: { type: String },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 export default model("User", userSchema);

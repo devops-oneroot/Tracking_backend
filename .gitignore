@@ -32,3 +32,6 @@ Thumbs.db
 # Uploads / temp
 public/temp/
 tmp/
+
+config/firebaseServiceAccount.json
+src/config/firebaseServiceAccount.json

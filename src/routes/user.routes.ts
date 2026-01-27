@@ -20,6 +20,7 @@ import {
   getProfile,
   getUserById,
   getAllUsers,
+  saveFcmToken,
 } from "../controllers/user.controller.js";
 
 import { requireAuth } from "../middlewares/auth.js";
@@ -37,5 +38,8 @@ router.get("/:id", requireAuth, getUserById);
 
 // ✅ GET ALL USERS
 router.get("/", getAllUsers);
+
+// SAVE FCM TOKEN
+router.post("/save-fcm", requireAuth, saveFcmToken);
 
 export default router;

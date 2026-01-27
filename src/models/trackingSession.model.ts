@@ -16,6 +16,7 @@ const trackingSessionSchema = new Schema(
     endImage: { type: String }, // ✅ Cloudinary URL
 
     totalPoints: { type: Number, default: 0 },
+    isActive: { type: Boolean, default: true },
   },
   { timestamps: true },
 );

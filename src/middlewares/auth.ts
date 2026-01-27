@@ -1,19 +1,25 @@
 import jwt from "jsonwebtoken";
-import { Request, Response, NextFunction } from "express";
+import User from "../models/User.model.js";
 
-export const requireAuth = (req: any, res: Response, next: NextFunction) => {
+export const requireAuth = async (req: any, res: any, next: any) => {
   try {
     const auth = req.headers.authorization;
 
-    if (!auth) return res.status(401).json({ message: "No token" });
+    if (!auth || !auth.startsWith("Bearer ")) {
+      return res.status(401).json({ message: "Not authorized" });
+    }
 
     const token = auth.split(" ")[1];
 
-    const payload = jwt.verify(token, process.env.JWT_ACCESS_SECRET!);
-    req.user = payload;
+    const decoded = jwt.verify(
+      token,
+      process.env.JWT_ACCESS_SECRET as string,
+    ) as { id: string };
+
+    req.user = { id: decoded.id };
 
     next();
-  } catch (e) {
+  } catch (err) {
     return res.status(401).json({ message: "Invalid token" });
   }
 };
