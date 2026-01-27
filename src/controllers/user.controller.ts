@@ -66,17 +66,12 @@ export const getAllUsers = async (req: Request, res: Response) => {
 };
 
 export const saveFcmToken = async (req, res) => {
-  try {
-    const userId = req.user.id; // from JWT
-    const { token } = req.body;
+  const userId = req.user.id;
+  const { token } = req.body;
 
-    if (!token) return res.status(400).json({ message: "Token required" });
+  if (!token) return res.status(400).json({ message: "Token required" });
 
-    await User.findByIdAndUpdate(userId, { fcmToken: token });
+  await User.findByIdAndUpdate(userId, { fcmToken: token });
 
-    res.json({ ok: true });
-  } catch (err) {
-    console.error("FCM SAVE ERROR:", err);
-    res.status(500).json({ message: "Failed to save token" });
-  }
+  res.json({ ok: true });
 };
