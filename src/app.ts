@@ -11,7 +11,7 @@ import authRoutes from "./routes/auth.routes.js";
 import trackingRoutes from "./routes/tracking.routes.js";
 import dashboardRoutes from "./routes/dashboard.routes.js";
 import { startAvailabilityCron } from "./cron/availability.cron.js";
-import testRoutes from "./routes/test.routes.js";
+
 const app = express();
 
 app.use(cors());
@@ -25,8 +25,6 @@ app.use("/api/loads", loadRoutes);
 app.use("/api/aggregators", aggregatorRoutes);
 app.use("/api/tracking", trackingRoutes);
 app.use("/api/dashboard", dashboardRoutes);
-
-app.use("/api/test", testRoutes);
 
 connectDB();
 startAvailabilityCron();
