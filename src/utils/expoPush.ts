@@ -1,15 +1,5 @@
 import fetch from "node-fetch";
 
-type ExpoPushResponse = {
-  data?: {
-    status?: string;
-    id?: string;
-    message?: string;
-    details?: any;
-  };
-  errors?: any[];
-};
-
 export async function sendExpoPush(
   token: string,
   title: string,
@@ -32,11 +22,11 @@ export async function sendExpoPush(
     }),
   });
 
-  const json = (await res.json()) as ExpoPushResponse;
+  const json = await res.json();
 
   if (json.data?.status !== "ok") {
-    console.error("❌ Expo Push Failed:", json);
+    console.error("❌ Expo Push Failed:", JSON.stringify(json));
   } else {
-    console.log("✅ Expo Push Sent:", json.data?.id);
+    console.log("✅ Expo Push Sent:", json.data.id);
   }
 }
