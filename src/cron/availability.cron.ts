@@ -46,7 +46,7 @@ import User from "../models/User.model.js";
 import { sendExpoPush } from "../utils/expoPush.js";
 
 export const startAvailabilityCron = () => {
-  cron.schedule("*/20 * * * *", async () => {
+  cron.schedule("*/5 * * * *", async () => {
     console.log("🔔 Availability reminder running...");
 
     try {
