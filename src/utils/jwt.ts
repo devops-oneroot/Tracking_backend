@@ -16,5 +16,8 @@ export const signRefreshToken = (payload: object) => {
 };
 
 export const verifyRefresh = (token: string) => {
-  return jwt.verify(token, refreshSecret) as { id: string; role?: string };
+  return jwt.verify(token, refreshSecret) as {
+    id: string;
+    role?: string;
+  };
 };
