@@ -1,16 +1,45 @@
 import Task from "../models/Task.model.js";
+import User from "../models/User.model.js";
+import { sendPush } from "../utils/expoPush.js";
 
 /* ================= ASSIGN TASK (DASHBOARD) ================= */
 
 /* ================= ASSIGN TASK ================= */
+// export const assignTask = async (req, res) => {
+//   try {
+//     const { userId, title, description } = req.body;
+
+//     if (!userId || !title) {
+//       return res.status(400).json({ message: "userId and title required" });
+//     }
+
+//     const task = await Task.create({
+//       title,
+//       description,
+//       assignedTo: userId,
+//       assignedBy: "ADMIN",
+//     });
+
+//     res.json(task);
+//   } catch (err) {
+//     console.error("ASSIGN TASK ERROR:", err);
+//     res.status(500).json({ message: "Assign task failed" });
+//   }
+// };
+
 export const assignTask = async (req, res) => {
   try {
     const { userId, title, description } = req.body;
 
+    console.log("🟡 ASSIGN TASK API HIT");
+    console.log("➡️ Payload:", { userId, title, description });
+
     if (!userId || !title) {
+      console.log("❌ Missing userId or title");
       return res.status(400).json({ message: "userId and title required" });
     }
 
+    // 1️⃣ Create task
     const task = await Task.create({
       title,
       description,
@@ -18,9 +47,41 @@ export const assignTask = async (req, res) => {
       assignedBy: "ADMIN",
     });
 
+    console.log("✅ Task created:", task._id.toString());
+
+    // 2️⃣ Fetch user's push token
+    const user = await User.findById(userId).select("fcmToken name");
+
+    if (!user) {
+      console.log("❌ User not found:", userId);
+    } else {
+      console.log("👤 User found:", user.name);
+      console.log("📱 User fcmToken:", user.fcmToken);
+    }
+
+    // 3️⃣ Send push notification (ONCE)
+    if (user?.fcmToken) {
+      console.log("🚀 Sending TASK_ASSIGNED push...");
+
+      const expoRes = await sendPush(
+        user.fcmToken,
+        title, // 🔥 task title as notification title
+        "You have a new task assigned",
+        {
+          type: "TASK_ASSIGNED",
+          taskId: task._id.toString(),
+        },
+      );
+
+      console.log("📦 EXPO RESPONSE:", expoRes);
+      console.log("📤 Task push sent to user:", userId);
+    } else {
+      console.log("⚠️ No fcmToken for user:", userId);
+    }
+
     res.json(task);
   } catch (err) {
-    console.error("ASSIGN TASK ERROR:", err);
+    console.error("❌ ASSIGN TASK ERROR:", err);
     res.status(500).json({ message: "Assign task failed" });
   }
 };
