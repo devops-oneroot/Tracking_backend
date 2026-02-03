@@ -13,6 +13,7 @@ import dashboardRoutes from "./routes/dashboard.routes.js";
 import { startAvailabilityCron } from "./cron/availability.cron.js";
 import availabilityRoutes from "./routes/availability.routes.js";
 import taskRoutes from "./routes/task.routes.js";
+import farmerRoutes from "./routes/farmer.routes.js";
 
 const app = express();
 
@@ -29,6 +30,7 @@ app.use("/api/aggregators", aggregatorRoutes);
 app.use("/api/tracking", trackingRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/availability", availabilityRoutes);
+app.use("/api/farmer", farmerRoutes);
 
 connectDB();
 startAvailabilityCron();
