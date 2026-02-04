@@ -2,12 +2,29 @@ import { Request, Response } from "express";
 import Farmer from "../models/Farmer.model.js";
 
 /* ================= ONBOARD FARMER ================= */
+
 export const createFarmer = async (req: Request, res: Response) => {
   try {
-    const { name, phone, cropType, district, taluk, village, landSize } =
-      req.body;
+    const {
+      name,
+      phone,
+      cropType,
+      state,
+      district,
+      taluk,
+      village,
+      landSize,
 
-    if (!name || !phone || !cropType || !district || !taluk || !village) {
+      cropCost,
+      inputSupplier,
+      paymentType,
+      droneSprayingConsent,
+      agronomistCareConsent,
+      location,
+      photo,
+    } = req.body;
+
+    if (!name || !phone || !cropType) {
       return res.status(400).json({ message: "Missing required fields" });
     }
 
@@ -20,10 +37,19 @@ export const createFarmer = async (req: Request, res: Response) => {
       name,
       phone,
       cropType,
+      state,
       district,
       taluk,
       village,
       landSize,
+
+      cropCost,
+      inputSupplier,
+      paymentType,
+      droneSprayingConsent,
+      agronomistCareConsent,
+      location,
+      photo,
     });
 
     res.status(201).json({
@@ -41,20 +67,41 @@ export const getFarmers = async (req: Request, res: Response) => {
     const {
       page = "1",
       limit = "10",
+
       cropType,
+      state,
       district,
       taluk,
       village,
+
+      paymentType,
+      droneSprayingConsent,
+      agronomistCareConsent,
+
       search,
     } = req.query;
 
     const query: any = {};
 
+    /* ===== BASIC FILTERS ===== */
     if (cropType) query.cropType = cropType;
+    if (state) query.state = state;
     if (district) query.district = district;
     if (taluk) query.taluk = taluk;
     if (village) query.village = village;
 
+    /* ===== NEW FILTERS ===== */
+    if (paymentType) query.paymentType = paymentType;
+
+    if (droneSprayingConsent !== undefined) {
+      query.droneSprayingConsent = droneSprayingConsent === "true";
+    }
+
+    if (agronomistCareConsent !== undefined) {
+      query.agronomistCareConsent = agronomistCareConsent === "true";
+    }
+
+    /* ===== SEARCH ===== */
     if (search) {
       query.$or = [
         { name: { $regex: search, $options: "i" } },
@@ -70,6 +117,7 @@ export const getFarmers = async (req: Request, res: Response) => {
         .sort({ createdAt: -1 })
         .skip((pageNumber - 1) * pageSize)
         .limit(pageSize),
+
       Farmer.countDocuments(query),
     ]);
 
@@ -80,7 +128,10 @@ export const getFarmers = async (req: Request, res: Response) => {
       totalPages: Math.ceil(total / pageSize),
     });
   } catch (error) {
-    res.status(500).json({ message: "Failed to fetch farmers", error });
+    res.status(500).json({
+      message: "Failed to fetch farmers",
+      error,
+    });
   }
 };
 
@@ -89,7 +140,56 @@ export const updateFarmer = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
 
-    const farmer = await Farmer.findByIdAndUpdate(id, req.body, {
+    const {
+      name,
+      phone,
+      cropType,
+      state,
+      district,
+      taluk,
+      village,
+      landSize,
+
+      cropCost,
+      inputSupplier,
+      paymentType,
+      droneSprayingConsent,
+      agronomistCareConsent,
+      location,
+      photo,
+    } = req.body;
+
+    const updatePayload: any = {};
+
+    if (name !== undefined) updatePayload.name = name;
+    if (phone !== undefined) updatePayload.phone = phone;
+    if (cropType !== undefined) updatePayload.cropType = cropType;
+
+    if (state !== undefined) updatePayload.state = state;
+
+    if (district !== undefined) updatePayload.district = district;
+    if (taluk !== undefined) updatePayload.taluk = taluk;
+    if (village !== undefined) updatePayload.village = village;
+
+    if (landSize !== undefined) updatePayload.landSize = landSize;
+
+    /* ===== NEW FIELDS ===== */
+    if (cropCost !== undefined) updatePayload.cropCost = cropCost;
+    if (inputSupplier !== undefined)
+      updatePayload.inputSupplier = inputSupplier;
+
+    if (paymentType !== undefined) updatePayload.paymentType = paymentType;
+
+    if (droneSprayingConsent !== undefined)
+      updatePayload.droneSprayingConsent = droneSprayingConsent;
+
+    if (agronomistCareConsent !== undefined)
+      updatePayload.agronomistCareConsent = agronomistCareConsent;
+
+    if (location !== undefined) updatePayload.location = location;
+    if (photo !== undefined) updatePayload.photo = photo;
+
+    const farmer = await Farmer.findByIdAndUpdate(id, updatePayload, {
       new: true,
       runValidators: true,
     });
@@ -103,6 +203,9 @@ export const updateFarmer = async (req: Request, res: Response) => {
       farmer,
     });
   } catch (error) {
-    res.status(500).json({ message: "Failed to update farmer", error });
+    res.status(500).json({
+      message: "Failed to update farmer",
+      error,
+    });
   }
 };
