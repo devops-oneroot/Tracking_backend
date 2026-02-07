@@ -17,6 +17,7 @@ export const createFarmer = async (req: Request, res: Response) => {
 
       cropCost,
       inputSupplier,
+      additionalInfo,
       paymentType,
       droneSprayingConsent,
       agronomistCareConsent,
@@ -45,6 +46,7 @@ export const createFarmer = async (req: Request, res: Response) => {
 
       cropCost,
       inputSupplier,
+      additionalInfo,
       paymentType,
       droneSprayingConsent,
       agronomistCareConsent,
@@ -152,6 +154,7 @@ export const updateFarmer = async (req: Request, res: Response) => {
 
       cropCost,
       inputSupplier,
+      additionalInfo,
       paymentType,
       droneSprayingConsent,
       agronomistCareConsent,
@@ -177,6 +180,9 @@ export const updateFarmer = async (req: Request, res: Response) => {
     if (cropCost !== undefined) updatePayload.cropCost = cropCost;
     if (inputSupplier !== undefined)
       updatePayload.inputSupplier = inputSupplier;
+
+    if (additionalInfo !== undefined)
+      updatePayload.additionalInfo = additionalInfo;
 
     if (paymentType !== undefined) updatePayload.paymentType = paymentType;
 

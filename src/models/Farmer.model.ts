@@ -12,6 +12,7 @@ export interface IFarmer extends Document {
 
   cropCost?: string;
   inputSupplier?: string;
+  additionalInfo?: string;
   paymentType?: "credit" | "cash";
   droneSprayingConsent?: boolean;
   agronomistCareConsent?: boolean;
@@ -43,6 +44,7 @@ const FarmerSchema = new Schema<IFarmer>(
     /* ===== NEW FIELDS ===== */
     cropCost: { type: String },
     inputSupplier: { type: String },
+    additionalInfo: { type: String },
     paymentType: { type: String, enum: ["credit", "cash"] },
 
     droneSprayingConsent: { type: Boolean, default: false },
