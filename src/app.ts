@@ -35,6 +35,11 @@ app.use("/api/farmer", farmerRoutes);
 connectDB();
 startAvailabilityCron();
 
+// Home route
+app.get("/", (req, res) => {
+  res.send("👋 Welcome to Markhet tracking");
+});
+
 app.listen(ENV.PORT, () => {
   console.log(`🚀 Server running on port ${ENV.PORT}`);
 });
