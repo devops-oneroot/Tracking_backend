@@ -5,27 +5,6 @@ import { sendPush } from "../utils/expoPush.js";
 /* ================= ASSIGN TASK (DASHBOARD) ================= */
 
 /* ================= ASSIGN TASK ================= */
-// export const assignTask = async (req, res) => {
-//   try {
-//     const { userId, title, description } = req.body;
-
-//     if (!userId || !title) {
-//       return res.status(400).json({ message: "userId and title required" });
-//     }
-
-//     const task = await Task.create({
-//       title,
-//       description,
-//       assignedTo: userId,
-//       assignedBy: "ADMIN",
-//     });
-
-//     res.json(task);
-//   } catch (err) {
-//     console.error("ASSIGN TASK ERROR:", err);
-//     res.status(500).json({ message: "Assign task failed" });
-//   }
-// };
 
 export const assignTask = async (req, res) => {
   try {

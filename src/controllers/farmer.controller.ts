@@ -1,240 +1,13 @@
-// import { Request, Response } from "express";
-// import Farmer from "../models/Farmer.model.js";
-
-// /* ================= ONBOARD FARMER ================= */
-
-// export const createFarmer = async (req: Request, res: Response) => {
-//   try {
-//     const {
-//       name,
-//       phone,
-//       crops, // ✅ array of crops
-
-//       state,
-//       district,
-//       taluk,
-//       village,
-//       landSize,
-
-//       inputSupplier,
-//       additionalInfo,
-
-//       payment, // ✅ { type, additionalInfo }
-//       droneSprayingConsent, // ✅ { value, additionalInfo }
-//       agronomistCareConsent, // ✅ { value, additionalInfo }
-
-//       location,
-//       photo,
-//     } = req.body;
-
-//     if (!name || !phone || !Array.isArray(crops) || crops.length === 0) {
-//       return res.status(400).json({
-//         message: "Name, phone and at least one crop are required",
-//       });
-//     }
-
-//     const exists = await Farmer.findOne({ phone });
-//     if (exists) {
-//       return res.status(409).json({ message: "Farmer already exists" });
-//     }
-
-//     const farmer = await Farmer.create({
-//       name,
-//       phone,
-//       crops,
-//       state,
-//       district,
-//       taluk,
-//       village,
-//       landSize,
-//       inputSupplier,
-//       additionalInfo,
-//       payment,
-//       droneSprayingConsent,
-//       agronomistCareConsent,
-//       location,
-//       photo,
-//     });
-
-//     res.status(201).json({
-//       message: "Farmer onboarded successfully",
-//       farmer,
-//     });
-//   } catch (error) {
-//     res.status(500).json({
-//       message: "Failed to onboard farmer",
-//       error,
-//     });
-//   }
-// };
-
-// /* ================= FETCH FARMERS (DASHBOARD) ================= */
-
-// export const getFarmers = async (req: Request, res: Response) => {
-//   try {
-//     const {
-//       page = "1",
-//       limit = "10",
-
-//       cropName, // ✅ changed
-//       state,
-//       district,
-//       taluk,
-//       village,
-
-//       paymentType,
-//       droneSprayingConsent,
-//       agronomistCareConsent,
-
-//       search,
-//     } = req.query;
-
-//     const query: any = {};
-
-//     /* ===== BASIC FILTERS ===== */
-//     if (state) query.state = state;
-//     if (district) query.district = district;
-//     if (taluk) query.taluk = taluk;
-//     if (village) query.village = village;
-
-//     /* ===== CROP FILTER ===== */
-//     if (cropName) {
-//       query["crops.name"] = cropName;
-//     }
-
-//     /* ===== PAYMENT FILTER ===== */
-//     if (paymentType) {
-//       query["payment.type"] = paymentType;
-//     }
-
-//     /* ===== CONSENT FILTERS ===== */
-//     if (droneSprayingConsent !== undefined) {
-//       query["droneSprayingConsent.value"] = droneSprayingConsent === "true";
-//     }
-
-//     if (agronomistCareConsent !== undefined) {
-//       query["agronomistCareConsent.value"] = agronomistCareConsent === "true";
-//     }
-
-//     /* ===== SEARCH ===== */
-//     if (search) {
-//       query.$or = [
-//         { name: { $regex: search, $options: "i" } },
-//         { phone: { $regex: search, $options: "i" } },
-//       ];
-//     }
-
-//     const pageNumber = Number(page);
-//     const pageSize = Number(limit);
-
-//     const [farmers, total] = await Promise.all([
-//       Farmer.find(query)
-//         .sort({ createdAt: -1 })
-//         .skip((pageNumber - 1) * pageSize)
-//         .limit(pageSize),
-
-//       Farmer.countDocuments(query),
-//     ]);
-
-//     res.json({
-//       data: farmers,
-//       total,
-//       page: pageNumber,
-//       totalPages: Math.ceil(total / pageSize),
-//     });
-//   } catch (error) {
-//     res.status(500).json({
-//       message: "Failed to fetch farmers",
-//       error,
-//     });
-//   }
-// };
-
-// export const updateFarmer = async (req: Request, res: Response) => {
-//   try {
-//     const { id } = req.params;
-
-//     const {
-//       name,
-//       phone,
-//       crops,
-
-//       state,
-//       district,
-//       taluk,
-//       village,
-//       landSize,
-
-//       inputSupplier,
-//       additionalInfo,
-//       payment,
-//       droneSprayingConsent,
-//       agronomistCareConsent,
-
-//       location,
-//       photo,
-//     } = req.body;
-
-//     const updatePayload: any = {};
-
-//     if (name !== undefined) updatePayload.name = name;
-//     if (phone !== undefined) updatePayload.phone = phone;
-//     if (crops !== undefined) updatePayload.crops = crops;
-
-//     if (state !== undefined) updatePayload.state = state;
-//     if (district !== undefined) updatePayload.district = district;
-//     if (taluk !== undefined) updatePayload.taluk = taluk;
-//     if (village !== undefined) updatePayload.village = village;
-//     if (landSize !== undefined) updatePayload.landSize = landSize;
-
-//     if (inputSupplier !== undefined)
-//       updatePayload.inputSupplier = inputSupplier;
-
-//     if (additionalInfo !== undefined)
-//       updatePayload.additionalInfo = additionalInfo;
-
-//     if (payment !== undefined) updatePayload.payment = payment;
-//     if (droneSprayingConsent !== undefined)
-//       updatePayload.droneSprayingConsent = droneSprayingConsent;
-//     if (agronomistCareConsent !== undefined)
-//       updatePayload.agronomistCareConsent = agronomistCareConsent;
-
-//     if (location !== undefined) updatePayload.location = location;
-//     if (photo !== undefined) updatePayload.photo = photo;
-
-//     const farmer = await Farmer.findByIdAndUpdate(id, updatePayload, {
-//       new: true,
-//       runValidators: true,
-//     });
-
-//     if (!farmer) {
-//       return res.status(404).json({ message: "Farmer not found" });
-//     }
-
-//     res.json({
-//       message: "Farmer updated successfully",
-//       farmer,
-//     });
-//   } catch (error) {
-//     res.status(500).json({
-//       message: "Failed to update farmer",
-//       error,
-//     });
-//   }
-// };
-
 // controllers/farmer.controller.ts
+
 import { Request, Response } from "express";
 import mongoose, { Types } from "mongoose";
 import Farmer, { IFarmer } from "../models/Farmer.model.js";
 
-// ────────────────────────────────────────────────
-// Helper Types
-// ────────────────────────────────────────────────
-
 interface CreateFarmerBody {
   name: string;
   phone: string;
+  onboardedBy?: string;
   crops: Array<{
     name: string;
     price?: string;
@@ -277,10 +50,6 @@ interface PaginationQuery {
   search?: string;
 }
 
-// ────────────────────────────────────────────────
-// CREATE - Onboard new farmer
-// ────────────────────────────────────────────────
-
 export const createFarmer = async (
   req: Request<{}, {}, CreateFarmerBody>,
   res: Response,
@@ -290,6 +59,7 @@ export const createFarmer = async (
       name,
       phone,
       crops = [],
+      onboardedBy,
       additionalCrops,
       state,
       district,
@@ -356,6 +126,9 @@ export const createFarmer = async (
     const farmerData: Partial<IFarmer> = {
       name: name.trim(),
       phone: normalizedPhone,
+      onboardedBy: onboardedBy
+        ? new mongoose.Types.ObjectId(onboardedBy)
+        : undefined,
       crops: crops.map((c) => ({
         name: c.name.trim(),
         price: c.price?.trim(),
@@ -425,91 +198,6 @@ export const createFarmer = async (
     });
   }
 };
-
-// ────────────────────────────────────────────────
-// READ - List farmers with filters & pagination
-// ────────────────────────────────────────────────
-
-// export const getFarmers = async (
-//   req: Request<{}, {}, {}, PaginationQuery>,
-//   res: Response,
-// ) => {
-//   try {
-//     const {
-//       page = "1",
-//       limit = "10",
-//       cropName,
-//       state,
-//       district,
-//       taluk,
-//       village,
-//       paymentType,
-//       droneSprayingConsent,
-//       agronomistCareConsent,
-//       search,
-//     } = req.query;
-
-//     const query: Record<string, any> = {};
-
-//     if (state) query.state = state;
-//     if (district) query.district = district;
-//     if (taluk) query.taluk = taluk;
-//     if (village) query.village = village;
-
-//     if (cropName) query["crops.name"] = cropName;
-
-//     if (paymentType && (paymentType === "cash" || paymentType === "credit")) {
-//       query["payment.type"] = paymentType;
-//     }
-
-//     if (droneSprayingConsent !== undefined) {
-//       query["droneSprayingConsent.value"] =
-//         droneSprayingConsent === "true" || droneSprayingConsent === true;
-//     }
-
-//     if (agronomistCareConsent !== undefined) {
-//       query["agronomistCareConsent.value"] =
-//         agronomistCareConsent === "true" || agronomistCareConsent === true;
-//     }
-
-//     if (search && typeof search === "string" && search.trim()) {
-//       query.$or = [
-//         { name: { $regex: search.trim(), $options: "i" } },
-//         { phone: { $regex: search.trim(), $options: "i" } },
-//       ];
-//     }
-
-//     const pageNum = Math.max(1, Number(page));
-//     const pageSize = Math.min(50, Math.max(1, Number(limit)));
-
-//     const [farmers, total] = await Promise.all([
-//       Farmer.find(query)
-//         .sort({ createdAt: -1 })
-//         .skip((pageNum - 1) * pageSize)
-//         .limit(pageSize)
-//         .lean(),
-//       Farmer.countDocuments(query),
-//     ]);
-
-//     return res.json({
-//       success: true,
-//       data: farmers,
-//       pagination: {
-//         page: pageNum,
-//         limit: pageSize,
-//         total,
-//         totalPages: Math.ceil(total / pageSize),
-//       },
-//     });
-//   } catch (error: any) {
-//     console.error("Get farmers error:", error);
-//     return res.status(500).json({
-//       success: false,
-//       message: "Failed to fetch farmers",
-//       error: error.message || "Internal server error",
-//     });
-//   }
-// };
 
 export const getFarmers = async (
   req: Request<{}, {}, {}, PaginationQuery>,
@@ -691,6 +379,63 @@ export const updateFarmer = async (
     return res.status(500).json({
       success: false,
       message: "Failed to update farmer",
+      error: error.message || "Internal server error",
+    });
+  }
+};
+
+// getFarmersOnboardedByUser
+export const getFarmersOnboardedByUser = async (
+  req: Request<{ userId: string }, {}, {}, { page?: string; limit?: string }>,
+  res: Response,
+) => {
+  try {
+    const { userId } = req.params;
+    const { page = "1", limit = "10" } = req.query;
+
+    // Validate userId
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid userId",
+      });
+    }
+
+    // Safe pagination values
+    const pageNum = Math.max(1, Number(page) || 1);
+    const pageSize = Math.max(1, Math.min(100, Number(limit) || 10));
+    const skip = (pageNum - 1) * pageSize;
+
+    const filter = {
+      onboardedBy: new mongoose.Types.ObjectId(userId),
+    };
+
+    const [farmers, total] = await Promise.all([
+      Farmer.find(filter)
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(pageSize)
+        .lean(),
+      Farmer.countDocuments(filter),
+    ]);
+
+    return res.json({
+      success: true,
+      userId,
+      data: farmers,
+      pagination: {
+        page: pageNum,
+        limit: pageSize,
+        total,
+        totalPages: Math.ceil(total / pageSize),
+      },
+    });
+  } catch (error: any) {
+    console.error("Get farmers onboarded by user error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch farmers",
       error: error.message || "Internal server error",
     });
   }

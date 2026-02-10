@@ -14,20 +14,6 @@ export const createVisit = async (req: Request, res: Response) => {
   res.status(201).json(visit);
 };
 
-// export const getAllVisits = async (req: Request, res: Response) => {
-//   try {
-//     const visits = await Visit.find()
-//       .populate("user", "name phone role")
-//       .sort({ createdAt: -1 });
-
-//     res.json(visits);
-//   } catch (error: any) {
-//     res.status(500).json({
-//       message: "Failed to fetch visits",
-//       error: error.message,
-//     });
-//   }
-// };
 export const getAllVisits = async (req: Request, res: Response) => {
   try {
     const { hasLoad } = req.query;

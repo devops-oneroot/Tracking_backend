@@ -62,7 +62,7 @@
 
 // export default model<IFarmer>("Farmer", FarmerSchema);
 
-import { Schema, model, Document } from "mongoose";
+import { Schema, model, Document, Types } from "mongoose";
 
 /* ===== SUB SCHEMAS ===== */
 
@@ -96,6 +96,7 @@ const ConsentSchema = new Schema(
 
 /* ===== FARMER INTERFACE ===== */
 export interface IFarmer extends Document {
+  onboardedBy: Types.ObjectId;
   name: string;
   phone: string;
 
@@ -146,6 +147,12 @@ const FarmerSchema = new Schema<IFarmer>(
   {
     name: { type: String, required: true, trim: true },
     phone: { type: String, required: true, unique: true },
+    onboardedBy: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+      index: true,
+    },
 
     /* ===== MULTIPLE CROPS ===== */
     crops: {
