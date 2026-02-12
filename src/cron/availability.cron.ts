@@ -74,10 +74,11 @@ import { sendPush } from "../utils/expoPush.js";
 //     }
 //   });
 // };
+
 export const startAvailabilityCron = () => {
   console.log("🚀 Availability reminder started");
 
-  const THIRTY_MIN = 30 * 60 * 1000; // 30 minutes
+  const THIRTY_MIN = 5 * 60 * 1000; // 30 minutes
 
   const runJob = async () => {
     console.log(
